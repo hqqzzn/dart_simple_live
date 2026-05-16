@@ -7,17 +7,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 安装Flutter环境
+      # 安装 Flutter
+      - name: 配置Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: latest-stable
+          flutter-version: '3.24.0'
+          cache: true
 
-      - name: 打包无签名IPA
+      # 安装CocoaPods依赖（Flutter iOS必须）
+      - name: 安装pod依赖
+        run: |
+          cd ios
+          pod install --repo-update
+
+      # 打包无签名IPA
+      - name: 打包IPA
         run: |
           flutter pub get
-          flutter build ipa --no-codesign
+          flutter build ipa --no-codesign --release
 
-      - name: 上传IPA
+      # 上传产物
+      - name: 下载IPA
         uses: actions/upload-artifact@v4
         with:
           name: 无签名IPA
